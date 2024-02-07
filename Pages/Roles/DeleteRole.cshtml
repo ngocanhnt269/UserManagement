@@ -1,0 +1,19 @@
+@page
+@model Code1stUsersRoles.Pages.Roles.DeleteRole
+@{
+    ViewData["Title"] = "DeleteRole";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+    <label for="roleId">Select Role:</label>
+    <select id="roleId" name="roleId">
+        @foreach (var role in Model.Roles)
+        {
+            <option value="@role.Id">@role.Name</option>
+        }
+    </select>
+    <br />
+    <button type="submit">Delete</button>
+</form>

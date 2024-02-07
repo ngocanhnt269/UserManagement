@@ -1,0 +1,29 @@
+@page
+@model Code1stUsersRoles.Pages.Users.RemoveFromRole
+@{
+    ViewData["Title"] = "AddToRole";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+    <label for="userId">Select User:</label>
+    <select id="userId" name="userId" asp-for="UserId">
+        @foreach (var user in Model.Users)
+        {
+            <option value="@user.Id">@user.UserName</option>
+        }
+    </select>
+    <br />
+
+    <label for="roleName">Select Role:</label>
+    <select id="roleName" name="roleName" asp-for="RoleName">
+        @foreach (var role in Model.Roles)
+        {
+            <option value="@role.Name">@role.Name</option>
+        }
+    </select>
+    <br />
+
+    <button type="submit">Remove from Role</button>
+</form>

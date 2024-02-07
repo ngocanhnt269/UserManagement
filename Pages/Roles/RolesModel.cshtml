@@ -1,0 +1,89 @@
+@page
+@model Code1stUsersRoles.Pages.RolesModel
+@using Microsoft.AspNetCore.Identity
+
+<div>
+    <h2>Roles</h2>
+
+    @if (Model.Roles != null)
+    {
+        @foreach (var role in Model.Roles)
+        {
+            <h3>@role.Name</h3>
+            @if (!string.IsNullOrEmpty(role.Name) && Model.GetUsersInRoleAsync(role.Name).Result is var usersInRole &&
+           usersInRole != null && usersInRole.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Member Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in usersInRole)
+                        {
+                            <tr>
+                                <td>@user.UserName</td>
+                                <td>
+                                    @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+                                    {
+                                        <!-- Remove user from role form -->
+                                        <form method="post" asp-page-handler="RemoveUserFromRole">
+                                            <input type="hidden" name="UserIdToRemove" value="@user.Id" />
+                                            <input type="hidden" name="RoleNameToRemove" value="@role.Name" />
+                                            <button type="submit">Remove</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No members found in the @role.Name role.</p>
+            }
+
+            <!-- Add user to the role form -->
+            @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+            {
+                <form method="post" asp-page-handler="AddUserToRole">
+                    <input type="hidden" name="RoleName" value="@role.Name" />
+                    <label for="userIdToAdd">User to Add:</label>
+                    <select id="userIdToAdd" name="UserIdToAdd">
+                        @foreach (var availableUser in Model.GetAvailableUsers() ?? Enumerable.Empty<IdentityUser>())
+                        {
+                            <option value="@availableUser.Id">@availableUser.UserName</option>
+                        }
+                    </select>
+                    <button type="submit">Add User</button>
+                </form>
+
+                <!-- Remove role form -->
+                <form method="post" asp-page-handler="RemoveRole">
+                    <input type="hidden" name="RoleIdToRemove" value="@role.Id" />
+                    <button type="submit">Remove Role</button>
+                </form>
+            }
+        }
+
+
+        <br />
+        <h4> Add new Roles: </h4>
+        <!-- Create role form -->
+        @if (User != null && User.IsInRole("Admin"))
+        {
+            <form method="post" asp-page-handler="CreateRole">
+                <label for="newRoleName">New Role Name:</label>
+                <input type="text" id="newRoleName" name="NewRoleName" required />
+                <button type="submit">Create Role</button>
+            </form>
+        }
+    }
+    else
+    {
+        <p>No roles found.</p>
+    }
+</div>
