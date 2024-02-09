@@ -1,7 +1,7 @@
 @page
 @model Code1stUsersRoles.Pages.UsersModel
 @{
-    ViewData["Title"] = "UsersModel";
+    ViewData["Title"] = "Users";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -24,8 +24,12 @@
                         <td>
                             @if (User.IsInRole("Admin"))
                             {
-                                <a asp-page="./EditUser" asp-route-userId="@user.Id">Edit</a>
-                                <a asp-page-handler="DeleteUser" asp-route-userId="@user.Id">Delete</a>
+                                @* <a asp-page="./EditUser" asp-route-userId="@user.Id">Edit</a> *@
+                                <form method="post" asp-page-handler="DeleteUser"
+                                    onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="submit">Delete</button>
+                                </form>
                             }
                         </td>
                     </tr>
@@ -34,36 +38,3 @@
         </tbody>
     </table>
 </div>
-
-
-
-@* @page
-@model Code1stUsersRoles.Pages.UsersModel
-@{
-ViewData["Title"] = "UsersModel";
-}
-
-<h1>@ViewData["Title"]</h1>
-
-<div>
-<table class="table">
-<thead>
-<tr>
-<th>User Name</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody>
-@foreach (var user in Model.Users)
-{
-<tr>
-<td>@user.UserName</td>
-<td>
-<a asp-page="./EditUser" asp-route-userId="@user.Id">Edit</a> |
-<a asp-page-handler="DeleteUser" asp-route-userId="@user.Id">Delete</a>
-</td>
-</tr>
-}
-</tbody>
-</table>
-</div> *@

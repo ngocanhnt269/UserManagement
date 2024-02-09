@@ -61,41 +61,48 @@ public class RolesModel : PageModel
     }
 
 
-    public async Task<IActionResult> OnPostCreateRoleAsync(string newRoleName)
-    {
-        if (!string.IsNullOrEmpty(newRoleName))
-        {
-            // Check if the role already exists
-            var roleExists = await _roleManager.RoleExistsAsync(newRoleName);
-            if (!roleExists)
-            {
-                var role = new IdentityRole { Name = newRoleName };
-                var result = await _roleManager.CreateAsync(role);
 
-                if (result.Succeeded)
-                {
-                    return RedirectToPage();
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Role already exists.");
-            }
+
+    public async Task<IActionResult> OnPostCreateRoleAsync(string newRoleName)
+
+    {
+        if (await _roleManager.RoleExistsAsync(newRoleName))
+        {
+            ModelState.AddModelError(string.Empty, "Role already exists.");
+            return Page();
         }
-        else
+        if (string.IsNullOrEmpty(newRoleName))
         {
             ModelState.AddModelError(string.Empty, "Role name cannot be empty.");
+            return Page();
         }
+
+
+        var role = new IdentityRole { Name = newRoleName };
+        var result = await _roleManager.CreateAsync(role);
+
+        if (result.Succeeded)
+        {
+            // Fetch roles again after creating a new role
+            Roles = _roleManager.Roles.ToList();
+            // Ensure Admins and Members are initialized
+            Admins = await _userManager.GetUsersInRoleAsync("Admin") ?? Enumerable.Empty<IdentityUser>();
+            Members = await _userManager.GetUsersInRoleAsync("Member") ?? Enumerable.Empty<IdentityUser>();
+            return RedirectToPage();
+        }
+
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
+
+        // Fetch roles again after encountering an error
+        Roles = _roleManager.Roles.ToList();
 
         return Page();
     }
+
+
 
     public async Task<IActionResult> OnPostRemoveRoleAsync(string roleIdToRemove)
     {

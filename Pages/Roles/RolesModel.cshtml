@@ -46,7 +46,6 @@
                 <p>No members found in the @role.Name role.</p>
             }
 
-            <!-- Add user to the role form -->
             @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
             {
                 <form method="post" asp-page-handler="AddUserToRole">
@@ -72,7 +71,6 @@
 
         <br />
         <h4> Add new Roles: </h4>
-        <!-- Create role form -->
         @if (User != null && User.IsInRole("Admin"))
         {
             <form method="post" asp-page-handler="CreateRole">
@@ -84,6 +82,6 @@
     }
     else
     {
-        <p>No roles found.</p>
+        <p>Role already exists. Please double check and create a new role</p>
     }
 </div>
